@@ -25,7 +25,7 @@ public class ConnectionUtils {
         //AMQP 5672
         factory.setPort(5672);
 
-        //vhost
+        //vhost_mmr RabbitMQ中间件的库名
         factory.setVirtualHost("/vhost_mmr");
 
         //设置用户名
