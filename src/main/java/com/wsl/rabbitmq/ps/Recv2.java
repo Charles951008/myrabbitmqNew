@@ -1,4 +1,4 @@
-package com.wsl.rabbitmq.workfair;
+package com.wsl.rabbitmq.ps;
 
 import com.rabbitmq.client.*;
 import com.wsl.rabbitmq.util.ConnectionUtils;
@@ -6,21 +6,21 @@ import com.wsl.rabbitmq.util.ConnectionUtils;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class Recv1 {
-    private static final String QUEUE_NAME = "test_work_queue";
+public class Recv2 {
+    private static final String QUEUE_NAME = "test_queue_fanout_sms";
+    private static final String EXCHANGE_NAME = "test_exchange_fanout";
 
     public static void main(String[] args) throws IOException, TimeoutException {
-        //获取链接
         Connection connection = ConnectionUtils.getConnection();
+        Channel channel = connection.createChannel();
 
-        //获取channel
-        final Channel channel = connection.createChannel();
-
-        //声明队列
+        //队列声明
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
+        //绑定队列带交换机或者转化器
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
 
-        int prefetchCount=1;
+        int prefetchCount = 1;
         channel.basicQos(prefetchCount);//保证一次只分发一个
 
 
@@ -33,16 +33,16 @@ public class Recv1 {
                                        AMQP.BasicProperties properties,
                                        byte[] body) throws IOException {
                 String msg = new String(body, "utf-8");
-                System.out.println("[1] Recv msg:" + msg);
+                System.out.println("[2] Recv msg:" + msg);
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    System.out.println("[1] done");
+                    System.out.println("[2] done");
 
-                    channel.basicAck(envelope.getDeliveryTag(),false);
+                    channel.basicAck(envelope.getDeliveryTag(), false);
                 }
             }
         };
